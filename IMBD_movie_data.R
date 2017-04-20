@@ -3,7 +3,9 @@ rm(list = ls())
 
 library(ggplot2)
 library(qgraph)
-
+library(psych)
+library(factoextra)
+library(corrplot)
 
 # Read in data set into a dataframe
 df <- read.csv("movie_metadata.csv", header = TRUE , sep = ",")
@@ -40,9 +42,22 @@ nums <- sapply(df, is.numeric)
 df <- as.data.frame(df[,nums])
 df <- df[complete.cases(df),]
 
+#Correlation plot of numberic variables
+corrplot(cor(df), method = "circle")
+
 # Principal Component Analysis
 qg_boxes_pca <- qgraph.pca(df, factors = 5)
+fit <- princomp(df, cor = TRUE)
+summary(fit)
+loadings(fit) # pc loadings 
+plot(fit,type = "lines") # scree plot 
+fit$scores # the principal components
+biplot(fit)
 
+#kmeans clustering
+km.res <- kmeans(df, 3, iter.max = 20, nstart = 200)
+fviz_cluster(km.res, data = df)
+km.res$tot.withinss/km.res$totss
 
 
 
